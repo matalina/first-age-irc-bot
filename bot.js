@@ -2,7 +2,7 @@
 var irc = require("irc");
 
 // Create the bot name
-var bot = new irc.Client('irc.mibbit.com', 'FAbot-dev', {
+var bot = new irc.Client('irc.mibbit.com', 'FAbot', {
 	channels: ['#thefirstage']
 });
 
