@@ -1,9 +1,9 @@
 // Get the lib
-var irc = require("irc");
+const irc = require("irc");
 
 // Create the bot name
-var bot = new irc.Client('irc.mibbit.com', 'FAbot', {
-	channels: ['#thefirstage']
+let bot = new irc.Client('irc.mibbit.com', 'FAbot-dev', {
+	channels: ['#testfa']
 });
 
 // Listen for joins
@@ -24,13 +24,13 @@ bot.addListener("join", function(channel, who) {
 });
 
 // Listen for any message, PM said user when he posts
-bot.addListener("pm", function(from, to, text, message) {
+bot.addListener("pm", function(from, to, message) {
     //console.log(from);
     //console.log(to);
     //console.log(text);
     //console.log(message);
-	let kick = lookForKickUser(text.args[1], from);
-    let log = lookForLogChat(text.args[1],from);
+	let kick = lookForKickUser(message.args[1], from);
+    let log = lookForLogChat(message.args[1],from);
 
     if(! kick || ! log) {
         bot.say(to,'Unable to do as you asked.');
@@ -45,12 +45,19 @@ bot.addListener('error', function(message) {
 
 //bot.send('MODE', '#yourchannel', '+o', 'yournick');
 
+function notEmpty(value)
+{
+    return value !== null &&
+        value !== undefined &&
+        value !== '';
+}
+
 function lookForKickUser(message, from) {
     let pattern = /kick ([\w\-\d]+) */,
         matches = pattern.exec(message),
         name;
 
-    if(matches !== null || matches !== undefined) {
+    if(notEmpty(matches)) {
         name = matches[1];
     }
     else {
@@ -64,7 +71,39 @@ function lookForKickUser(message, from) {
 }
 
 function lookForLogChat(message, from) {
+    let pattern = /log (start|stop)?/,
+        matches = pattern.exec(message),
+        command;
+
+    if(notEmpty(matches)) {
+        if(notEmpty(matches[1])) {
+            command = matches[1];
+        }
+        else {
+            command = 'start';
+        }
+    }
+    else {
+         return false;
+    }
+
+    if(command === 'start') {
+        bot.addListener('message#thefirstage', logChat);
+        bot.say(from, 'started');
+
+    }
+    else if(command === 'stop') {
+        bot.removeListener('message#thefirstage', logChat)
+        bot.say(from, 'stopped');
+    }
+
+
     return false;
+}
+
+const logChat = function(from, message) {
+    console.log(from + ' => #thefirstage: ' + message);
+
 }
 
 function randomWelcome(who) {
@@ -73,7 +112,7 @@ function randomWelcome(who) {
         who + ', what\'s new?',
         'Howdy, ' + who + '!',
         'Hey there, ' + who + "!",
-        ', what\'s happenin\', ' + who + "?",
+        'What\'s happenin\', ' + who + "?",
         'Hi, '+ who +'!',
         'Here\'s ' + who + "!",
         'Greetings and salutations, '+ who + '!',
