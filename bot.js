@@ -13,7 +13,7 @@ let bot = new irc.Client(process.env.IRC_NETWORK, process.env.BOT_NAME, {
 // Global Variables
 
 let logging_on = false,
-    file = null,
+    file = null;
 
 function notEmpty(value) {
     return value !== null && value !== undefined && value !== '';
@@ -83,12 +83,18 @@ const commands = {
         pattern: /kick ([\w\-\d]+) */,
         command: kickUser,
     },
-    log: {
+    /*log: {
         pattern: /log (start|stop)?/,
         command: logChat,
-    }
-
+    }*/
 };
+
+const responses = {
+    name: {
+        pattern: new RegExp(process.env.BOT_NAME),
+        command: respondToBotsName
+    }
+}
 
 // Listen for joins
 bot.addListener("join", function(channel, who) {
@@ -136,15 +142,20 @@ bot.addListener('error', function(message) {
 });
 
 // Listen to messages in channel
-client.addListener('message' + process.env.IRC_CHANNEL, function (from, message) {
-    console.log(from + ' => #yourchannel: ' + message);
+bot.addListener('message' + process.env.IRC_CHANNEL, function (from, message) {
+    console.log(from + ' on '+ process.env.IRC_CHANNEL + ': ' + message);
     if(logging_on) {
         logChatToFile(from, message);
+    }
+
+    for(type in responses) {
+        if(responses[type].pattern.test(message)) {
+            responses[type].command(from, message);
+        }
     }
 });
 
 /* Functions */
-
 function sendEmail(data) {
     const api_key = process.env.MAILGUN_API_KEY;
     const domain = process.env.MAILGUN_DOMAIN;
@@ -204,4 +215,12 @@ function logChatToFile(from, message) {
             sendEmail(data);
         }
     });
+}
+
+function respondToBotsName(from, message) {
+    if(/hi/.test(message) ||
+        /hey/.test(message) ||
+        /hello/.test(message)) {
+            bot.say(process.env.IRC_CHANNEL, 'How are you, ' + from + '?');
+        }
 }
