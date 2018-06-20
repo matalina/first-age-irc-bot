@@ -91,7 +91,7 @@ const commands = {
 
 const responses = {
     name: {
-        pattern: new RegExp(process.env.BOT_NAME),
+        pattern: new RegExp(process.env.BOT_NAME, 'i'),
         command: respondToBotsName
     }
 }
@@ -218,9 +218,33 @@ function logChatToFile(from, message) {
 }
 
 function respondToBotsName(from, message) {
-    if(/hi/.test(message) ||
-        /hey/.test(message) ||
-        /hello/.test(message)) {
+    if(/hi/i.test(message) ||
+        /hey/i.test(message) ||
+        /hello/i.test(message)) {
             bot.say(process.env.IRC_CHANNEL, 'How are you, ' + from + '?');
         }
+    else {
+        bot.say(process.env.IRC_CHANNEL, getRandomSaying());
+    }
+
+}
+
+function getRandomSaying() {
+    let sayings = [
+        'Huzzah!',
+        'Wha\'choo talin\' \'bout, Willis!',
+        'Discretion is the greater part of valor.',
+        'Everything you can imagine is real.',
+        'I could agree with you but then we’d both be wrong.',
+        "Fish and visitors stink after three days.",
+        "Black Holes are where God divided by zero.",
+        "I'd like to help you out. Which way did you come in?",
+        "On the other hand, you have different fingers.",
+        "Always remember to pillage BEFORE you burn.",
+        "Procrastination is the greatest labor saving invention of all time.",
+        'I don\'t suffer from insanity. I enjoy every minute of it.',
+    ],
+        random = Math.floor(Math.random() * sayings.length);
+
+    return sayings[random];
 }
