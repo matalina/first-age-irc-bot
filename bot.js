@@ -181,7 +181,7 @@ function randomWelcome(who) {
         'Hi, '+ who +'!',
         'Here\'s ' + who + "!",
         'Greetings and salutations, '+ who + '!',
-        'Oh, no! Not ' + who + 'again.',
+        'Oh, no! Not ' + who + ' again.',
         'Oh, yoohoo, '+ who + '!',
         'Aloha, ' + who + "!",
         'Hola, ' + who + '!',
