@@ -104,6 +104,7 @@ bot.addListener("join", function(channel, who) {
     let admins = [
         /^_?asc/i,
         /^_?ck/i,
+        /^_?ian/i,
     ];
 
     for (let i in admins) {
@@ -175,7 +176,7 @@ function randomWelcome(who) {
         who + ', welcome back!',
         who + ', what\'s new?',
         'Howdy, ' + who + '!',
-        'Oh, no! Not ' + who + 'again.',
+        'Oh, no! Not ' + who + ' again.',
         'Hey there, ' + who + "!",
         'What\'s happenin\', ' + who + "?",
         'Hi, '+ who +'!',
@@ -186,7 +187,7 @@ function randomWelcome(who) {
         'Aloha, ' + who + "!",
         'Hola, ' + who + '!',
         'Que Pasa, ' + who + "?",
-        'Konnichiwa,' + who + '!',
+        'Konnichiwa, ' + who + '!',
         'Namaste, ' + who + '!',
         'Oh, no! Not ' + who + ' again.',
     ];
