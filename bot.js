@@ -35,58 +35,12 @@ let kickUser = function(message, from) {
     bot.send('KICK', process.env.IRC_CHANNEL, name);
 }
 
-let logChat = function(message, from) {
-    let pattern = commands.log.pattern,
-        matches = pattern.exec(message),
-        command;
-
-        if(notEmpty(matches)) {
-            if(matches.length === 1) {
-                command = 'start';
-            }
-            else {
-                command = matches[1];
-            }
-        }
-        else {
-            bot.say(from, 'I can\'t do that on ' + process.env.IRC_CHANNEL);
-            return;
-        }
-
-        if(command === 'stop' && ! logging_on) {
-            bot.say(from, 'Logging has not been started on ' + process.env.IRC_CHANNEL);
-            return;
-        }
-
-        if(command === 'start' && logging_on) {
-            bot.say(from, 'Logging has already been turned on for ' + process.env.IRC_CHANNEL);
-            return;
-        }
-
-        if(command === 'start') {
-            logging_on = true;
-            file = moment.format(YYYYMMDD) + '.txt';
-            bot.say(from, 'Starting logging on ' + process.env.IRC_CHANNEL);
-        }
-        else if(command === 'stop') {
-            logging_on = false;
-            bot.say(from, 'Stopping logging on ' + process.env.IRC_CHANNEL);
-        }
-        else {
-            bot.say(from, 'I don\'t know what you are trying to do on ' + process.env.IRC_CHANNEL);
-            return;
-        }
-}
 
 const commands = {
     kick: {
         pattern: /kick ([\w\-\d]+) */,
         command: kickUser,
     },
-    /*log: {
-        pattern: /log (start|stop)?/,
-        command: logChat,
-    }*/
 };
 
 const responses = {
@@ -125,23 +79,6 @@ bot.addListener("pm", function(from, to, message) {
     }
 });
 
-// Listen for errors
-bot.addListener('error', function(message) {
-    console.log(message);
-
-    let text = message.args[0] + ' on ' + message.args[1] + ': ' + message.args[2];
-
-    let data = {
-      from: 'alicia@akddev.net',
-      to: 'alicia@akddev.net',
-      subject: '[Error] FA Bot command failed',
-      text: text,
-    };
-
-    sendEmail(data);
-
-});
-
 // Listen to messages in channel
 bot.addListener('message' + process.env.IRC_CHANNEL, function (from, message) {
     console.log(from + ' on '+ process.env.IRC_CHANNEL + ': ' + message);
@@ -157,20 +94,6 @@ bot.addListener('message' + process.env.IRC_CHANNEL, function (from, message) {
 });
 
 /* Functions */
-function sendEmail(data) {
-    const api_key = process.env.MAILGUN_API_KEY;
-    const domain = process.env.MAILGUN_DOMAIN;
-
-    const mailgun = require('mailgun-js')({
-        apiKey: api_key,
-        domain: domain
-    });
-
-    mailgun.messages().send(data, function (error, body) {
-
-    });
-}
-
 function randomWelcome(who) {
     let messages = [
         who + ', welcome back!',
@@ -194,28 +117,6 @@ function randomWelcome(who) {
 
     return messages[Math.floor(Math.random() * messages.length)];
 
-}
-
-function logChatToFile(from, message) {
-    let path = 'chats/' + file,
-        message = '';
-
-    fs.appendFile(path, message, function(error) {
-        if(error) {
-            console.log(error);
-
-            let text = JSON.stringify(error);
-
-            let data = {
-              from: 'alicia@akddev.net',
-              to: 'alicia@akddev.net',
-              subject: '[Error] Write File failed',
-              text: text,
-            };
-
-            sendEmail(data);
-        }
-    });
 }
 
 function respondToBotsName(from, message) {
